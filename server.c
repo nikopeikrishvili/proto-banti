@@ -5,15 +5,36 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/utsname.h>
-void error(char *msg);
- char *get_basic_info();
-
-
 
 void error(char *msg)
 {
 	perror(msg);
 	exit(0);
+}
+
+char *get_basic_info()
+{
+	struct utsname buffer;
+	char *data = malloc(1024); //i think its enough size
+   	int errno = 0;
+   	if (uname(&buffer) == 0)
+    	{
+	   	sprintf(data,"system name = %s\n", buffer.sysname);
+   		sprintf(data,"node name   = %s\n", buffer.nodename);
+   		sprintf(data,"release     = %s\n", buffer.release);
+   		sprintf(data,"version     = %s\n", buffer.version);
+   		sprintf(data,"machine     = %s\n", buffer.machine);
+
+	   #ifdef _GNU_SOURCE
+	      sprintf(data,"domain name = %s\n", buffer.domainname);
+	   #endif
+   }
+   else
+   {
+   	strcpy(data, "no result");
+   }
+   
+   return data;
 }
 
 int main(int argc, char *argv[])
@@ -54,6 +75,7 @@ int main(int argc, char *argv[])
 	{
 		error("ERROR on accept");
 	}
+	
 	bzero(buffer,1023);
 
 	while ((n = recv(newsockfd,buffer,255,0))>0)
@@ -64,40 +86,8 @@ int main(int argc, char *argv[])
 			close(sockfd);
 			break;
 		}
-		char answer = *get_basic_info();;
-		get_basic_info();
+		char answer = get_basic_info();
 		write(newsockfd,answer,sizeof(answer));
-
-		
+		free(answer);
 	}
-
-	
-
-	
-}
-
-char *get_basic_info()
-{
-	 
-	struct utsname buffer;
-	char *data;
-   	int errno = 0;
-   	if (uname(&buffer) == 0)
-    {
-
-	   	sprintf(data,"system name = %s\n", buffer.sysname);
-   		sprintf(data,"node name   = %s\n", buffer.nodename);
-   		sprintf(data,"release     = %s\n", buffer.release);
-   		sprintf(data,"version     = %s\n", buffer.version);
-   		sprintf(data,"machine     = %s\n", buffer.machine);
-
-	   #ifdef _GNU_SOURCE
-	      sprintf(data,"domain name = %s\n", buffer.domainname);
-	   #endif
-   }
-   else
-   {
-   	data = "no result";
-   }
-   return data;
 }
