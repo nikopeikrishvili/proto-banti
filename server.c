@@ -81,12 +81,12 @@ int main(int argc, char *argv[])
 	while ((n = recv(newsockfd,buffer,255,0))>0)
 	{
 		printf("Here is the message %s\n",buffer);
-		if(*buffer=='X')
+		if(strstr(buffer, "X") != NULL)
 		{
 			close(sockfd);
 			break;
 		}
-		char answer = get_basic_info();
+		char *answer = get_basic_info();
 		write(newsockfd,answer,sizeof(answer));
 		free(answer);
 	}
