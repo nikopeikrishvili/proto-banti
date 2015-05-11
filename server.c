@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <strings.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -20,10 +21,10 @@ char *get_basic_info()
    	if (uname(&buffer) == 0)
     	{
 	   	sprintf(data,"system name = %s\n", buffer.sysname);
-   		sprintf(data,"node name   = %s\n", buffer.nodename);
-   		sprintf(data,"release     = %s\n", buffer.release);
-   		sprintf(data,"version     = %s\n", buffer.version);
-   		sprintf(data,"machine     = %s\n", buffer.machine);
+   		sprintf(data,"%s; node name   = %s\n",data, buffer.nodename);
+   		sprintf(data,"%s; release     = %s\n", data,buffer.release);
+   		sprintf(data,"%s; version     = %s\n",data, buffer.version);
+   		sprintf(data,"%s; machine     = %s\n",data, buffer.machine);
 
 	   #ifdef _GNU_SOURCE
 	      sprintf(data,"domain name = %s\n", buffer.domainname);
@@ -86,7 +87,10 @@ int main(int argc, char *argv[])
 			close(sockfd);
 			break;
 		}
+
 		char *answer = get_basic_info();
+		printf("Size of answer = %lu\n",sizeof(answer));
+		printf("answer is  %s\n",answer);
 		write(newsockfd,answer,sizeof(answer));
 		free(answer);
 	}
