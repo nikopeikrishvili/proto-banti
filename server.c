@@ -1,11 +1,16 @@
+
+#include "include.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <strings.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/utsname.h>
+#include <signal.h>
+#include <fcntl.h> // open function
+#include <unistd.h> // close function
+#include "commander.h"
 
 void error(char *msg)
 {
@@ -28,37 +33,15 @@ void sig_handler(int sig)
     exit(-1);
 }
 
-char *get_basic_info()
-{
-	struct utsname buffer;
-	char *data = malloc(1024); //i think its enough size
-   	int errno = 0;
-   	if (uname(&buffer) == 0)
-    	{
-	   	sprintf(data,"system name = %s\n", buffer.sysname);
-   		sprintf(data,"%s; node name   = %s\n",data, buffer.nodename);
-   		sprintf(data,"%s; release     = %s\n", data,buffer.release);
-   		sprintf(data,"%s; version     = %s\n",data, buffer.version);
-   		sprintf(data,"%s; machine     = %s\n",data, buffer.machine);
 
-	   #ifdef _GNU_SOURCE
-	      sprintf(data,"domain name = %s\n", buffer.domainname);
-	   #endif
-   }
-   else
-   {
-   	strcpy(data, "no result");
-   }
-   
-   return data;
-}
 
 int main(int argc, char *argv[])
 {
-	int sockfd, newsockfd, portno,clilen;
-	char buffer[1024];
+	int sockfd, newsockfd, portno;
+	socklen_t clilen;
+	char *buffer[1024];
 	struct sockaddr_in serv_addr, cli_addr;
-	int n,an;
+	int n;
 	
 	/* Read signals */
     signal(SIGPIPE, sig_handler);
@@ -102,20 +85,27 @@ int main(int argc, char *argv[])
 		
 		while ((n = recv(newsockfd,buffer,255,0)) > 0)
 		{
-			buffer[1023] = '\0';
-			printf("Here is the message %s\n", buffer);
+			//buffer[1023] = '\0';
 
-			if(strstr(buffer, "x") != NULL)
+			//printf("Here is the message %s\n", buffer);
+
+			if(strstr(*buffer, "x") != NULL)
 			{
 				close(sockfd);
 				close(newsockfd);
 				exit(1);
 			}
-
+			call_function("function_a");
+			call_function("function_c");
 			/* Get and send anwer */
-			char *answer = get_basic_info();
-			send(newsockfd, answer, strlen(answer), 0);
-			free(answer);
+			//char *answer = get_basic_info();
+			// if (memchr(CommandNames, buffer, sizeof(CommandNames))
+			// {
+			  	
+			// }
+			//send(newsockfd, answer, strlen(answer), 0);
+			//free(answer);
+			bzero(&buffer,strlen(*buffer));
 		}
 	}
 }
