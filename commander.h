@@ -8,16 +8,18 @@ char const* CommandNames[]=
 }; 
 */
 
-void function_a(void) { printf("Function A\n"); }
-void function_b(void) { printf("Function B\n"); }
-void function_c(void) { printf("Function C\n"); }
-void function_d(void) { printf("Function D\n"); }
-void function_e(void) { printf("Function E\n"); }
+#include "include.h"
+
+void function_a(void);
+void function_b(void);
+void function_c(void);
+void function_d(void);
+void function_e(void);
 
 const static struct {
   const char *name;
   void (*func)(void);
-} function_map [] = {
+} function_map [5] = {
   { "function_a", function_a },
   { "function_b", function_b },
   { "function_c", function_c },
@@ -26,3 +28,5 @@ const static struct {
 };
 
 char *get_basic_info();
+
+int call_function(const char *name);
