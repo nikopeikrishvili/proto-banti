@@ -1,15 +1,5 @@
 
 #include "include.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <strings.h>
-#include <string.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <fcntl.h> // open function
-#include <unistd.h> // close function
 #include "commander.h"
 
 void error(char *msg)
@@ -33,7 +23,24 @@ void sig_handler(int sig)
     exit(-1);
 }
 
+int call_function(const char *name)
+{
 
+  int i;
+  for (i = 0; i < (sizeof(function_map) / sizeof(function_map[0])); i++) {
+    if (strcmp(function_map[i].name, name)==0  && function_map[i].func) {
+      	function_map[i].func();
+
+      return 0;
+    }
+    else
+    {
+
+    }
+  }
+
+  return -1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -83,30 +90,22 @@ int main(int argc, char *argv[])
 			error("ERROR on accept");
 		}
 		
+		bzero(buffer, 1024);
 		while ((n = recv(newsockfd,buffer,255,0)) > 0)
 		{
-			buffer[1023] = '\0';
-
-			
-
 			if(strstr(buffer, "x") != NULL)
 			{
 				close(sockfd);
 				close(newsockfd);
 				exit(1);
 			}
-			const char *temp = strdup(*buffer-2);
-			call_function(temp);
-			printf("%s\n",temp);
-			/* Get and send anwer */
-			//char *answer = get_basic_info();
-			// if (memchr(CommandNames, buffer, sizeof(CommandNames))
-			// {
-			  	
-			// }
-			//send(newsockfd, answer, strlen(answer), 0);
-			//free(answer);
-			//bzero(buffer,strlen(buffer));
 		}
+
+		/* Null terminate buffer */
+		buffer[1023] = '\0';
+
+		/* Call function */
+		call_function(buffer);
+		printf("%s\n", buffer);
 	}
 }

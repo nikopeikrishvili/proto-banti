@@ -5,7 +5,8 @@ char const* CommandNames[]=
     "areyoualive"
     "getsysinfo",
     "dissconnect",
-}; */
+}; 
+*/
 
 void function_a(void) { printf("Function A\n"); }
 void function_b(void) { printf("Function B\n"); }
@@ -24,22 +25,4 @@ const static struct {
   { "function_e", function_e },
 };
 
-int call_function(const char *name)
-{
-
-  int i;
-  for (i = 0; i < (sizeof(function_map) / sizeof(function_map[0])); i++) {
-    if (strcmp(function_map[i].name, name)==0  && function_map[i].func) {
-      	function_map[i].func();
-
-      return 0;
-    }
-    else
-    {
-
-    }
-  }
-
-  return -1;
-}
 char *get_basic_info();
