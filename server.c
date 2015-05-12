@@ -13,6 +13,21 @@ void error(char *msg)
 	exit(0);
 }
 
+void sig_handler(int sig) 
+{
+    /* Handle signals */
+    if (sig == SIGILL || sig == SIGSEGV) 
+        printf("Can not process data\n");
+
+    if (sig == SIGPIPE)
+        printf("Broken Pipe\n");
+
+    if (sig == SIGINT) 
+        printf("Cleanup on exit\n");
+
+    exit(-1);
+}
+
 char *get_basic_info()
 {
 	struct utsname buffer;
@@ -44,7 +59,13 @@ int main(int argc, char *argv[])
 	char buffer[1024];
 	struct sockaddr_in serv_addr, cli_addr;
 	int n,an;
-
+	
+	/* Read signals */
+    signal(SIGPIPE, sig_handler);
+    signal(SIGINT, sig_handler);
+    signal(SIGSEGV, sig_handler);
+    signal(SIGILL , sig_handler);
+    
 	if(argc<2)
 	{
 		fprintf(stderr, "Error no port provided\n");
@@ -71,27 +92,30 @@ int main(int argc, char *argv[])
 	listen(sockfd,5);
 	clilen = sizeof(cli_addr);
 
-	newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
-	if(newsockfd<0)
+	while (1) 
 	{
-		error("ERROR on accept");
-	}
-	
-	bzero(buffer,1023);
-
-	while ((n = recv(newsockfd,buffer,255,0))>0)
-	{
-		printf("Here is the message %s\n",buffer);
-		if(strstr(buffer, "X") != NULL)
+		newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
+		if(newsockfd<0)
 		{
-			close(sockfd);
-			break;
+			error("ERROR on accept");
 		}
+		
+		while ((n = recv(newsockfd,buffer,255,0)) > 0)
+		{
+			buffer[1023] = '\0';
+			printf("Here is the message %s\n", buffer);
 
-		char *answer = get_basic_info();
-		printf("Size of answer = %lu\n",sizeof(answer));
-		printf("answer is  %s\n",answer);
-		write(newsockfd,answer,sizeof(answer));
-		free(answer);
+			if(strstr(buffer, "x") != NULL)
+			{
+				close(sockfd);
+				close(newsockfd);
+				exit(1);
+			}
+
+			/* Get and send anwer */
+			char *answer = get_basic_info();
+			send(newsockfd, answer, strlen(answer), 0);
+			free(answer);
+		}
 	}
 }
