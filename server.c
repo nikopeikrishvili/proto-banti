@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 {
 	int sockfd, newsockfd, portno;
 	socklen_t clilen;
-	char *buffer[1024];
+	char buffer[1024];
 	struct sockaddr_in serv_addr, cli_addr;
 	int n;
 	
@@ -85,18 +85,19 @@ int main(int argc, char *argv[])
 		
 		while ((n = recv(newsockfd,buffer,255,0)) > 0)
 		{
-			//buffer[1023] = '\0';
+			buffer[1023] = '\0';
 
-			//printf("Here is the message %s\n", buffer);
+			
 
-			if(strstr(*buffer, "x") != NULL)
+			if(strstr(buffer, "x") != NULL)
 			{
 				close(sockfd);
 				close(newsockfd);
 				exit(1);
 			}
-			call_function("function_a");
-			call_function("function_c");
+			const char *temp = strdup(*buffer-2);
+			call_function(temp);
+			printf("%s\n",temp);
 			/* Get and send anwer */
 			//char *answer = get_basic_info();
 			// if (memchr(CommandNames, buffer, sizeof(CommandNames))
@@ -105,7 +106,7 @@ int main(int argc, char *argv[])
 			// }
 			//send(newsockfd, answer, strlen(answer), 0);
 			//free(answer);
-			bzero(&buffer,strlen(*buffer));
+			//bzero(buffer,strlen(buffer));
 		}
 	}
 }

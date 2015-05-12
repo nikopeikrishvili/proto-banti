@@ -26,7 +26,7 @@ const static struct {
 
 int call_function(const char *name)
 {
-	printf("calledd function %s\n",name);
+
   int i;
   for (i = 0; i < (sizeof(function_map) / sizeof(function_map[0])); i++) {
     if (strcmp(function_map[i].name, name)==0  && function_map[i].func) {
@@ -36,7 +36,7 @@ int call_function(const char *name)
     }
     else
     {
-    	printf("%s\n",function_map[i].name );
+
     }
   }
 
