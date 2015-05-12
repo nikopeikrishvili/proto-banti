@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     int socket, ret, type = 0;
 
     /* Check arguments */
-    if (!argv[2]) 
+    if (!argv[2])
     {
         printf("Usage: %s <port> <command>\n\n", argv[0]);
         exit(0);
