@@ -6,7 +6,6 @@ OBJS = server.$(OBJ) commander.$(OBJ)
 
 all: $(OBJS)
 	$(CC) $(CFLAGS) -o server $(OBJS) $(LIB)
-	$(CC) $(CFLAGS) -o client client.c $(LIB)
 
 server.$(OBJ): commander.h include.h
 commander.$(OBJ): commander.h include.h
@@ -18,4 +17,4 @@ install: server
 
 .PHONY: clean
 clean:
-	$(RM) server client $(OBJS)
+	$(RM) server $(OBJS)
